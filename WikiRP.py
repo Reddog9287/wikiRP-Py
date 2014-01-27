@@ -6,6 +6,18 @@ import ast
 # Strip out anything between <ref> and <\/ref>
 # Strip out anything between {{ and }}
 
+def scrape(string, start, end):
+	splitString = string.split(end)
+
+	final = ""
+	x=0
+	for i in splitString:
+		if start in splitString[x]:
+			substring = splitString[x].split(start)
+			final += substring[0]
+		x = x+1
+	return final
+
 class WikiRP(object):
 	def __init__(self):
 		self.thesis = raw_input("Enter a thesis statement: ")
@@ -42,14 +54,11 @@ class WikiRP(object):
 			pageid = self.out["query"]["pages"].keys()[0]
 			self.content = self.out["query"]["pages"][pageid]["revisions"][0]["*"]
 
-		print self.content
-		while "</ref>" in self.content:
-			substring = self.content.split("</ref>")[0].split("<ref>") # Splits the paper for a ref
-			print substring[1]
-			print "Test"
+		strippedRefs = scrape(self.content, "<ref>", "</ref>")
+		print scrape(strippedRefs, "{{","}}")
 
 	def buildPaper():
-		# Do this
+		# Build a text document or PDF or something
 		return
 
 researchPaper = WikiRP()
