@@ -16,6 +16,7 @@ def scrape(string, start, end):
 			substring = splitString[x].split(start)
 			final += substring[0]
 		x = x+1
+	# print final
 	return final
 
 class WikiRP(object):
@@ -54,8 +55,19 @@ class WikiRP(object):
 			pageid = self.out["query"]["pages"].keys()[0]
 			self.content = self.out["query"]["pages"][pageid]["revisions"][0]["*"]
 
-		strippedRefs = scrape(self.content, "<ref>", "</ref>")
+		strippedRefs = scrape(self.content, "<ref", "</ref>")
+		# print scrape(strippedRefs, "==", "==")
 		print scrape(strippedRefs, "{{","}}")
+
+		# @NOTE: Errors
+		# -------------------------------------
+		# if searching for @start: {{ and @end: }} - if @end does not exist,
+		# then there is an error parsing and the whole thing is thrown off
+		# -------------------------------------
+		# if @start and @end are the same, then nothing is returned at all
+
+		# Pythagoras works great as it is
+		# In_Rainbows_%e2%80%93_From_the_Basement gives some errors
 
 	def buildPaper():
 		# Build a text document or PDF or something
@@ -70,3 +82,5 @@ if researchPaper.errors(): # This is pretty wasteful code so...
 	researchPaper.parse()
 	researchPaper.makeRequest("pages")
 researchPaper.parse()
+
+# In_Rainbows_%e2%80%93_From_the_Basement
