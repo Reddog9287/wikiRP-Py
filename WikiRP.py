@@ -1,7 +1,15 @@
 # coding=utf-8
 
+from __future__ import print_function
+
+import itertools
+import sys
+import nltk
+from nltk.grammar import Nonterminal, parse_cfg
+
 import urllib2
 import ast
+import nltk
 
 # Strip out anything between <ref> and </ref> - done
 # Strip out anything between {{ and }}
@@ -48,8 +56,8 @@ def sentencer(string):
 	# print sentences[3]
 	# sentences = ''
 	for i in sentences:
-		print '---------------------------------------------------'
-		print i # Really have to split this string by ".\n" or just build sentences string by splitting by "." instead of ". "
+		print('---------------------------------------------------')
+		print(i) # Really have to split this string by ".\n" or just build sentences string by splitting by "." instead of ". "
 		# sentences = i.split(". ")
 		# print sentences[0]
 		# for x in sentences:
@@ -78,7 +86,7 @@ class WikiRP(object):
 	def errors(self):
 		if "#Redirect" in self.content:
 			redirect = self.content.split("]]")[0].split("[[")[1]
-			print redirect
+			print(redirect)
 			return True
 		else:
 			return False
@@ -86,7 +94,7 @@ class WikiRP(object):
 	def parse(self):
 		if self.method == "search":
 			self.thesis = self.out["query"]["search"][0]["title"]
-			print "New Title: "+self.thesis+"\nMaking new Pages request...."
+			print("New Title: "+self.thesis+"\nMaking new Pages request....")
 		else:
 			pageid = self.out["query"]["pages"].keys()[0]
 			self.content = self.out["query"]["pages"][pageid]["revisions"][0]["*"]
@@ -114,3 +122,57 @@ if researchPaper.errors(): # This is pretty wasteful code so...
 researchPaper.parse()
 
 # In_Rainbows_%e2%80%93_From_the_Basement
+
+def generate(grammar, start=None, depth=None, n=None):
+    """
+    Generates an iterator of all sentences from a CFG.
+
+    :param grammar: The Grammar used to generate sentences.
+    :param start: The Nonterminal from which to start generate sentences.
+    :param depth: The maximal depth of the generated tree.
+    :param n: The maximum number of sentences to return.
+    :return: An iterator of lists of terminal tokens.
+    """
+    if not start:
+        start = grammar.start()
+    if depth is None:
+        depth = sys.maxsize
+
+    iter = _generate_all(grammar, [start], depth)
+
+    if n:
+        iter = itertools.islice(iter, n)
+
+    return iter
+
+def _generate_all(grammar, items, depth):
+    if items:
+        for frag1 in _generate_one(grammar, items[0], depth):
+            for frag2 in _generate_all(grammar, items[1:], depth):
+                yield frag1 + frag2
+    else:
+        yield []
+
+def _generate_one(grammar, item, depth):
+    if depth > 0:
+        if isinstance(item, Nonterminal):
+            for prod in grammar.productions(lhs=item):
+                for frag in _generate_all(grammar, prod.rhs(), depth-1):
+                    yield frag
+        else:
+            yield [item]
+
+# I SUCK AT WRITING GRAMMARS
+radio_grammar = """
+S -> NP VP
+	PP -> Det NP
+	NP -> Det NNP
+	VP -> 'is' PP JJ JJ
+	NNP -> 'Rainbows' | 'Basement' | 'Radiohead'
+	JJ -> 'English' | 'alternative' | 'rock' | 'band'
+	Det -> 'In' | 'the' | 'a' | 'by' | 'from'
+	N -> 'video' | 'album' | 'rock' | 'band'
+"""
+grammar = parse_cfg(radio_grammar)
+for n, sent in enumerate(generate(grammar, n=10), 1):
+        print('%3d. %s' % (n, ' '.join(sent)))
