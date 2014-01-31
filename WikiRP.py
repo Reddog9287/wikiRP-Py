@@ -164,15 +164,15 @@ def _generate_one(grammar, item, depth):
 
 # I SUCK AT WRITING GRAMMARS
 radio_grammar = """
-S -> NP VP
-	PP -> Det NP
-	NP -> Det NNP
-	VP -> 'is' PP JJ JJ
-	NNP -> 'Rainbows' | 'Basement' | 'Radiohead'
+S -> NP VP PP
+	NP -> NNP Det Det NNP
+	VP -> 'is' Det N N Det
+	PP -> JJ JJ NNP
+	NNP -> 'In Rainbows' | 'Basement' | 'Radiohead'
 	JJ -> 'English' | 'alternative' | 'rock' | 'band'
-	Det -> 'In' | 'the' | 'a' | 'by' | 'from'
+	Det -> 'the' | 'a' | 'by' | 'from'
 	N -> 'video' | 'album' | 'rock' | 'band'
 """
 grammar = parse_cfg(radio_grammar)
-for n, sent in enumerate(generate(grammar, n=10), 1):
+for n, sent in enumerate(generate(grammar, n=10000), 1):
         print('%3d. %s' % (n, ' '.join(sent)))
