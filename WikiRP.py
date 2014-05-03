@@ -44,7 +44,7 @@ def scrape(string, start, end):
 # @NOTE: Errors
 # -------------------------------------
 # if searching for @start: {{ and @end: }} - if @end does not exist,
-# then there is an error parsing and the whole thing is thrown off
+# then there is an error parsing and the whole thing is thrown off - done
 # -------------------------------------
 # if @start and @end are the same, then nothing is returned at all
 
@@ -56,7 +56,7 @@ def sentencer(string):
 	# print sentences[3]
 	# sentences = ''
 	for i in sentences:
-		print('---------------------------------------------------')
+		print('------------------------------------------------------------------------------------------------------')
 		print(i) # Really have to split this string by ".\n" or just build sentences string by splitting by "." instead of ". "
 		# sentences = i.split(". ")
 		# print sentences[0]
@@ -162,7 +162,6 @@ def _generate_one(grammar, item, depth):
         else:
             yield [item]
 
-# I SUCK AT WRITING GRAMMARS
 radio_grammar = """
 S -> NP VP PP
 	NP -> NNP Det Det NNP
@@ -174,5 +173,5 @@ S -> NP VP PP
 	N -> 'video' | 'album' | 'rock' | 'band'
 """
 grammar = parse_cfg(radio_grammar)
-for n, sent in enumerate(generate(grammar, n=10000), 1):
+for n, sent in enumerate(generate(grammar, n=100), 1):
         print('%3d. %s' % (n, ' '.join(sent)))
